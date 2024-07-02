@@ -15,27 +15,33 @@ def page_home():
 def page_produto():
     compra_form = CompraProdutoForm()
     venda_form = VendaProdutoForm()
+
     if request.method == "POST":
         compra_produto = request.form.get('compra_produto')
-        produto_obj = Item.query.filter_by(nome=compra_produto).first()
-        if produto_obj:
-            if current_user.compra_disponivel(produto_obj):
-                produto_obj.compra(current_user)
-                flash(f"Parabens! Você comprou o produto {produto_obj.nome}", category="success")
-            else:
-                flash(f"Você não possui saldo suficiente para compra o produto {produto_obj.nome}",category="danger")
-        venda_produto = request.form.get('venda produto')
-        produto_obj_venda = Item.query.filter_by(nome=venda_produto).first()
-        if produto_obj_venda:
-            if current_user.venda_disponivel(produto_obj_venda):
-                produto_obj_venda.venda(current_user)
-                flash(f"Parabens! Você vendeu o produto {produto_obj.nome}", category="success")
-            else:
-                flash(f"Algo deu errado com a venda do produto {produto_obj_venda.nome}", category="danger")
-    if request.method == "GET":
-        itens = Item.query.filter_by(dono=None)
-        dono_itens = Item.query.filter_by(dono=current_user.id)
-    return render_template("produtos.html", itens=itens, compra_form=compra_form,dono_itens=dono_itens, venda_form=venda_form)
+        venda_produto = request.form.get('venda_produto')
+
+        if compra_produto:
+            produto_obj = Item.query.filter_by(nome=compra_produto).first()
+            if produto_obj:
+                if current_user.compra_disponivel(produto_obj):
+                    produto_obj.compra(current_user)
+                    flash(f"Parabéns! Você comprou o produto {produto_obj.nome}", category="success")
+                else:
+                    flash(f"Você não possui saldo suficiente para comprar o produto {produto_obj.nome}", category="danger")
+
+        if venda_produto:
+            produto_obj_venda = Item.query.filter_by(nome=venda_produto).first()
+            if produto_obj_venda:
+                if current_user.venda_disponivel(produto_obj_venda):
+                    produto_obj_venda.venda(current_user)
+                    flash(f"Parabéns! Você vendeu o produto {produto_obj_venda.nome}", category="success")
+                else:
+                    flash(f"Algo deu errado com a venda do produto {produto_obj_venda.nome}", category="danger")
+
+    itens = Item.query.filter_by(dono=None)
+    dono_itens = Item.query.filter_by(dono=current_user.id)
+
+    return render_template("produtos.html", itens=itens, compra_form=compra_form, dono_itens=dono_itens, venda_form=venda_form)
 
 @app.route('/cadastro', methods=['GET', 'POST'])
 def page_cadastro():
